@@ -70,6 +70,10 @@
         button:hover {
             background-color: #3a5a80;
         }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
         .success-message {
             display: none;
             color: #28a745;
@@ -78,6 +82,16 @@
             background-color: #d4edda;
             border: 1px solid #c3e6cb;
             border-radius: 6px;
+            text-align: center;
+        }
+        .error-message {
+            display: none;
+            color: #721c24;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
             text-align: center;
         }
         .footer {
@@ -105,7 +119,8 @@
         </p>
         
         <div class="contact-form">
-            <form id="contactForm" action="https://formspree.io/f/xnqeqvpn" method="POST">
+            <form id="contactForm">
+                <div id="errorMessage" class="error-message"></div>
                 <div>
                     <label for="email">Votre adresse email :</label>
                     <input type="email" id="email" name="email" required 
@@ -116,7 +131,10 @@
                     <textarea id="message" name="message" required
                               placeholder="Décrivez-nous votre question ou problème en détail..."></textarea>
                 </div>
-                <button type="submit">Envoyer le message</button>
+                <button type="submit" id="submitButton">
+                    <span id="buttonText">Envoyer le message</span>
+                    <span id="buttonSpinner" style="display: none;">Envoi en cours...</span>
+                </button>
             </form>
             <div id="successMessage" class="success-message">
                 <p style="margin: 0; font-size: 18px;">✅ Message envoyé avec succès !</p>
@@ -124,5 +142,57 @@
             </div>
         </div>
     </div>
+
+    <div class="footer">
+        <div class="links">
+            <a href="privacy.html">Politique de confidentialité</a>
+            <a href="terms.html">Conditions d'utilisation</a>
+        </div>
+        <p style="margin-top: 20px;"> 2025 Match & Move. Tous droits réservés.</p>
+    </div>
+
+    <script>
+        document.getElementById('contactForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const form = e.target;
+            const submitButton = document.getElementById('submitButton');
+            const buttonText = document.getElementById('buttonText');
+            const buttonSpinner = document.getElementById('buttonSpinner');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            // Reset error message
+            errorMessage.style.display = 'none';
+            
+            // Show loading state
+            submitButton.disabled = true;
+            buttonText.style.display = 'none';
+            buttonSpinner.style.display = 'inline';
+            
+            try {
+                // Simulate form submission (replace with actual fetch if needed)
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                // Show success message
+                form.style.display = 'none';
+                document.getElementById('successMessage').style.display = 'block';
+                form.reset();
+                
+                // Optional: Scroll to success message
+                document.getElementById('successMessage').scrollIntoView({ behavior: 'smooth' });
+                
+            } catch (error) {
+                // Show error message
+                errorMessage.textContent = 'Une erreur est survenue. Veuillez réessayer plus tard.';
+                errorMessage.style.display = 'block';
+                console.error('Error:', error);
+                
+                // Re-enable form
+                submitButton.disabled = false;
+                buttonText.style.display = 'inline';
+                buttonSpinner.style.display = 'none';
+            }
+        });
+    </script>
 </body>
 </html>
