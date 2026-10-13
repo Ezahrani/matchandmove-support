@@ -127,6 +127,16 @@
                            placeholder="votre@email.com">
                 </div>
                 <div>
+                    <label for="type">Objet :</label>
+                    <select id="type" name="type" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:6px;font-size:16px;margin-bottom:15px;">
+                        <option value="contact">Question ou problème</option>
+                        <option value="account_deletion">Supprimer mon compte et mes données</option>
+                    </select>
+                </div>
+                <div style="position:absolute;left:-5000px;" aria-hidden="true">
+                    <input type="text" name="website" id="website" tabindex="-1" autocomplete="off">
+                </div>
+                <div>
                     <label for="message">Comment pouvons-nous vous aider ?</label>
                     <textarea id="message" name="message" required
                               placeholder="Décrivez-nous votre question ou problème en détail..."></textarea>
@@ -147,11 +157,22 @@
         <div class="links">
             <a href="privacy.html">Politique de confidentialité</a>
             <a href="terms.html">Conditions d'utilisation</a>
+            <a href="suppression-compte.html">Supprimer mon compte</a>
         </div>
-        <p style="margin-top: 20px;"> 2025 Match & Move. Tous droits réservés.</p>
+        <p style="margin-top: 20px;">© 2026 Match & Move. Tous droits réservés.</p>
     </div>
 
     <script>
+        const SUPPORT_ENDPOINT = 'https://europe-west1-matchandmove-8286a.cloudfunctions.net/supportContact';
+        // Pré-sélection depuis un lien : index.html#suppression
+        if (location.hash === '#suppression') {
+            document.getElementById('type').value = 'account_deletion';
+            document.getElementById('message').required = false;
+        }
+        document.getElementById('type').addEventListener('change', function () {
+            document.getElementById('message').required = this.value === 'contact';
+        });
+
         document.getElementById('contactForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -170,8 +191,17 @@
             buttonSpinner.style.display = 'inline';
             
             try {
-                // Simulate form submission (replace with actual fetch if needed)
-                await new Promise(resolve => setTimeout(resolve, 1500));
+                const response = await fetch(SUPPORT_ENDPOINT, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: form.email.value,
+                        message: form.message.value,
+                        type: form.type.value,
+                        website: form.website.value,
+                    }),
+                });
+                if (!response.ok) throw new Error('HTTP ' + response.status);
                 
                 // Show success message
                 form.style.display = 'none';
